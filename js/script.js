@@ -19,19 +19,27 @@ document.addEventListener('DOMContentLoaded', () => {
         favFilmCheck = document.querySelector('#fav-film-check'),
         addFilm = document.querySelector('#add-film');
 
-    adv.forEach(item => {
-        item.remove();
-    });
+    const deleteAdv = (arr) => {
+        arr.forEach(item => {
+            item.remove();
+        });
+    };
 
-    genre.textContent = 'Драма';
+    const makeChanges = () => {
+        genre.textContent = 'Драма';
+        poster.style.backgroundImage = 'url("img/bg.jpg")';
+    };
 
-    poster.style.backgroundImage = 'url("img/bg.jpg")';
+    const sortArr = (arr) => {
+        arr.sort();
+    };
 
     movieDB.movies.sort();
 
     function createMovieList(films, parent) {
         parent.innerHTML = '';
-    
+        sortArr(films);
+
         films.forEach((film, i) => {
             parent.innerHTML += `
                 <li class="promo__interactive-item">${i + 1} - ${film}
@@ -39,26 +47,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 </li>
             `;
         });
-    }
 
-    createMovieList(movieDB.movies, movieList);
+        document.querySelectorAll('.delete').forEach((btn, i) => {
+             btn.addEventListener('click', () => {
+                btn.parentElement.remove();
+                movieDB.movies.splice(i, 1);
+                createMovieList(films, parent);
+             });
+        });
+
+    }
 
     // add-film
 
     let filmInput;
 
-    addFilm.addEventListener('click', (element) => {
+    addFilm.addEventListener('click', (event) => {
 
-        element.preventDefault();
+        event.preventDefault();
         filmInput = document.querySelector('#adding-input');
 
-        if (filmInput.value == '' || filmInput.value == undefined) {
+        if (!filmInput.value) {
             alert('Неверное значение фильма, заполните снова');
 
         } else {
             if (filmInput.value.length > 21) {
-                filmInput.value = filmInput.value.substr(0, 21);
-                filmInput.value += '...';
+                filmInput.value = `${filmInput.value.substring(0,21)}...`;
 
             }
             if (favFilmCheck.checked) {
@@ -66,19 +80,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             }
             movieDB.movies.push(filmInput.value);
-            movieList.innerHTML += `
-                <li class="promo__interactive-item">${movieDB.movies.length} - ${filmInput.value}
-                    <div class="delete"></div>
-                </li>
-            `;
-            movieDB.movies.sort();
-
+            sortArr(movieDB.movies);
+            createMovieList(movieDB.movies, movieList);
         }
 
         filmInput.value = '';
     });
 
-
+    deleteAdv(adv);
+    makeChanges();
+    createMovieList(movieDB.movies, movieList);
 
 });
 
